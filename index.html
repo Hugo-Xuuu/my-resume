@@ -1,97 +1,307 @@
-'use strict';
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日待办 | Today's Focus</title>
+    
+    <!-- 知识点: 外部资源引入 -->
+    <!-- 引入Google Fonts字体，提升网站的视觉质感。我们选用 'Inter' 字体。 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
-// --- 1. 经典方式：构造函数与原型 (ES5及之前) ---
-console.log('--- 1. 使用原型继承 ---');
+    <!-- 知识点: 内部CSS样式 -->
+    <!-- 我们将所有的样式都写在这里，以替代Tailwind CSS。 -->
+    <style>
+        /* --- 1. 全局与重置样式 --- */
+        /* 知识点: CSS盒模型 */
+        /* `box-sizing: border-box;` 是一个最佳实践，它让元素的宽度和高度计算包含了内边距(padding)和边框(border)，布局更容易。 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-// a. 定义一个“父类”：Person
-function Person(name, age) {
-    // 构造函数：负责初始化实例自身的属性
-    // 这些属性是每个实例独有的
-    this.name = name;
-    this.age = age;
-}
+        body {
+            /* 知识点: 字体与背景 */
+            font-family: 'Inter', sans-serif; /* 设置全局字体 */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 华丽的渐变背景 */
+            min-height: 100vh; /* 确保body至少和视口一样高 */
+            display: flex; /* 使用Flexbox布局，轻松实现垂直水平居中 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            padding: 1rem; /* 1rem = 16px, 在小屏幕上提供一些边距 */
+        }
 
-// 在 Person 的原型(prototype)上定义共享的方法
-// 所有 Person 的实例都可以访问这个方法，且内存中只有一份
-Person.prototype.sayHello = function() {
-    console.log(`大家好，我是${this.name}，今年${this.age}岁。`);
-};
+        /* --- 2. 主要布局与容器 --- */
+        .app-container {
+            width: 100%;
+            max-width: 512px; /* 限制最大宽度，在大屏幕上不会过宽 */
+            margin: 0 auto;
+        }
 
-// b. 定义一个“子类”：Student，并实现继承
-function Student(name, age, major) {
-    // “借用”父类的构造函数来初始化继承来的属性
-    // 使用 .call(this, ...) 来确保父类构造函数里的 this 指向 Student 的实例
-    Person.call(this, name, age);
+        /* 知识点: 伪元素与复杂背景 */
+        /* 使用 backdrop-filter 实现玻璃拟态效果 (Glassmorphism) */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* 兼容Safari浏览器 */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1rem; /* 圆角 */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 添加阴影增加立体感 */
+            padding: 2rem;
+        }
 
-    // 添加子类自己独有的属性
-    this.major = major;
-    this.getmajor = () => {return this.major};
-}
+        /* --- 3. 组件样式 --- */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
 
-// c. 链接原型链 (继承共享方法的关键步骤)
-// 创建一个临时的空对象，其原型指向父类的原型
-// 然后让子类的原型指向这个空对象
-Student.prototype = Object.create(Person.prototype);
-// 修复子类原型的 constructor 指针，让它指回 Student 自身
-Student.prototype.constructor = Student;
+        h1 {
+            font-size: 2.25rem; /* 标题字体大小 */
+            font-weight: 700; /* 字体加粗 */
+            color: white;
+            letter-spacing: 0.05em; /* 字符间距 */
+        }
 
-// d. 在子类的原型上添加新方法
-Student.prototype.study = function() {
-    console.log(`我正在学习${this.major}专业。`);
-};
+        #date-display {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
 
-// e. 创建实例并测试
-const personInstance = new Person('老王', 40);
-const studentInstance = new Student('小明', 21, '电子信息工程');
+        #add-todo-form {
+            display: flex;
+            gap: 0.75rem; /* 元素之间的间距 */
+            margin-bottom: 1.5rem;
+        }
 
-personInstance.sayHello();
-studentInstance.sayHello(); // 成功调用了从 Person 继承来的方法
-studentInstance.study();    // 成功调用了自己独有的方法
+        #new-todo-input {
+            flex-grow: 1; /* 让输入框占据所有剩余空间 */
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            outline: none; /* 移除默认的蓝色外边框 */
+            transition: all 0.3s ease; /* 知识点: 过渡动画 */
+        }
 
+        #new-todo-input::placeholder { /* 知识点: 伪类选择器 */
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-// --- 2. 现代方式：Class 语法糖 (ES6及之后) ---
-console.log('\n--- 2. 使用Class语法 ---');
+        #new-todo-input:focus { /* 知识点: 伪类选择器 */
+            border-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
 
-// a. 定义一个“父类”：Animal
-class Animal {
-    // constructor 就是构造函数
-    constructor(name) {
-        this.name = name;
-    }
+        .add-btn {
+            background-color: #8B5CF6; /* 紫色 */
+            color: white;
+            font-weight: 700;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-    // 在class中直接定义方法，它们会自动被添加到原型上
-    speak() {
-        console.log(`${this.name} 发出了一些声音。`);
-    }
-}
+        .add-btn:hover { /* 知识点: 伪类选择器 - 交互效果 */
+            background-color: #7C3AED;
+            transform: scale(1.05); /* 悬停时放大 */
+        }
 
-// b. 使用 `extends` 关键字实现继承
-class Cat extends Animal {
-    constructor(name, action) {
-        // `super(name)` 调用父类的构造函数，必须在第一行
-        super(name);
-        this.action = action;
-    }
+        .add-btn:active {
+            transform: scale(0.95); /* 点击时缩小 */
+        }
+        
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
 
-    // 重写(Override)父类的方法
-    speak() {
-        console.log(`${this.name} 喵喵叫。`);
-    }
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .filter-btn, #clear-completed-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn:hover, #clear-completed-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .filter-btn.active {
+             background-color: rgba(255, 255, 255, 0.2);
+        }
 
-    // 添加子类自己的方法
-    purr() {
-        console.log(`${this.name} 正在 ${this.action}。`);
-    }
-}
+        #todo-list-container {
+            max-height: 20rem; /* 列表最大高度 */
+            overflow-y: auto; /* 内容超出时显示滚动条 */
+            padding-right: 0.5rem; /* 为滚动条留出空间 */
+        }
+        
+        #todo-list {
+            list-style: none; /* 移除默认的列表点 */
+        }
 
-// c. 创建实例并测试
-const genericAnimal = new Animal('某种动物');
-const kitty = new Cat('咪咪', '咕噜咕噜');
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .todo-item.done {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .todo-item .task-text.done {
+            text-decoration: line-through; /* 删除线 */
+        }
 
-genericAnimal.speak(); // 输出: 某种动物 发出了一些声音。
-kitty.speak();         // 输出: 咪咪 喵喵叫。(子类重写的方法生效了)
-kitty.purr();          // 输出: 咪咪 正在 咕噜咕噜。
+        .todo-item-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .delete-btn:hover {
+            color: white;
+        }
 
-// 验证继承关系
-console.log(kitty instanceof Cat);    // true
-console.log(kitty instanceof Animal); // true，证明继承链是成功的
+        footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+        }
+        
+        .credits {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        /* --- 4. 动画与自定义组件 --- */
+        /* 知识点: @keyframes 动画 */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .todo-item.new {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.9); }
+        }
+        .todo-item.removing {
+            animation: fadeOut 0.3s ease-in;
+        }
+
+        /* 知识点: 自定义表单控件 */
+        .custom-checkbox {
+            appearance: none; /* 移除浏览器默认样式 */
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-shrink: 0; /* 防止flex布局压缩它 */
+        }
+        .custom-checkbox:checked {
+            background-color: #8B5CF6;
+            border-color: #8B5CF6;
+        }
+        .custom-checkbox:checked::after {
+            content: '✔';
+            color: white;
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="app-container">
+        <div class="glass-container">
+            <header>
+                <h1>Today's Focus</h1>
+                <p id="date-display"></p>
+            </header>
+
+            <form id="add-todo-form">
+                <input 
+                    id="new-todo-input"
+                    type="text" 
+                    placeholder="添加新任务，然后按回车..."
+                >
+                <button type="submit" class="add-btn">添加</button>
+            </form>
+
+            <div class="filter-controls">
+                <div class="filter-buttons">
+                    <button data-filter="all" class="filter-btn active">全部</button>
+                    <button data-filter="active" class="filter-btn">未完成</button>
+                    <button data-filter="completed" class="filter-btn">已完成</button>
+                </div>
+                <button id="clear-completed-btn">清除已完成</button>
+            </div>
+
+            <div id="todo-list-container">
+                <ul id="todo-list">
+                    <!-- 待办事项将由JavaScript动态生成 -->
+                </ul>
+            </div>
+            
+            <footer>
+                <p><span id="active-count">0</span> 个任务未完成</p>
+            </footer>
+        </div>
+        
+        <p class="credits">由 Gemini 精心为您打造</p>
+    </main>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
