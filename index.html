@@ -25,6 +25,7 @@ function Student(name, age, major) {
 
     // 添加子类自己独有的属性
     this.major = major;
+    this.getmajor = () => {return this.major};
 }
 
 // c. 链接原型链 (继承共享方法的关键步骤)
