@@ -5,162 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>今日待办 | Today's Focus</title>
     
-    <!-- 知识点: 外部资源引入 -->
-    <!-- 引入Google Fonts字体，提升网站的视觉质感。我们选用 'Inter' 字体。 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- 知识点: 内部CSS样式 -->
-    <!-- 我们将所有的样式都写在这里，以替代Tailwind CSS。 -->
     <style>
-        /* --- 1. 全局与重置样式 --- */
-        /* 知识点: CSS盒模型 */
-        /* `box-sizing: border-box;` 是一个最佳实践，它让元素的宽度和高度计算包含了内边距(padding)和边框(border)，布局更容易。 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            /* 知识点: 字体与背景 */
-            font-family: 'Inter', sans-serif; /* 设置全局字体 */
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* 华丽的渐变背景 */
-            min-height: 100vh; /* 确保body至少和视口一样高 */
-            display: flex; /* 使用Flexbox布局，轻松实现垂直水平居中 */
-            align-items: center; /* 垂直居中 */
-            justify-content: center; /* 水平居中 */
-            padding: 1rem; /* 1rem = 16px, 在小屏幕上提供一些边距 */
-        }
-
-        /* --- 2. 主要布局与容器 --- */
-        .app-container {
-            width: 100%;
-            max-width: 512px; /* 限制最大宽度，在大屏幕上不会过宽 */
-            margin: 0 auto;
-        }
-
-        /* 知识点: 伪元素与复杂背景 */
-        /* 使用 backdrop-filter 实现玻璃拟态效果 (Glassmorphism) */
-        .glass-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* 兼容Safari浏览器 */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1rem; /* 圆角 */
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 添加阴影增加立体感 */
-            padding: 2rem;
-        }
-
-        /* --- 3. 组件样式 --- */
-        header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        h1 {
-            font-size: 2.25rem; /* 标题字体大小 */
-            font-weight: 700; /* 字体加粗 */
-            color: white;
-            letter-spacing: 0.05em; /* 字符间距 */
-        }
-
-        #date-display {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 0.5rem;
-        }
-
-        #add-todo-form {
-            display: flex;
-            gap: 0.75rem; /* 元素之间的间距 */
-            margin-bottom: 1.5rem;
-        }
-
-        #new-todo-input {
-            flex-grow: 1; /* 让输入框占据所有剩余空间 */
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid transparent;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            outline: none; /* 移除默认的蓝色外边框 */
-            transition: all 0.3s ease; /* 知识点: 过渡动画 */
-        }
-
-        #new-todo-input::placeholder { /* 知识点: 伪类选择器 */
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        #new-todo-input:focus { /* 知识点: 伪类选择器 */
-            border-color: rgba(255, 255, 255, 0.5);
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .add-btn {
-            background-color: #8B5CF6; /* 紫色 */
-            color: white;
-            font-weight: 700;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .add-btn:hover { /* 知识点: 伪类选择器 - 交互效果 */
-            background-color: #7C3AED;
-            transform: scale(1.05); /* 悬停时放大 */
-        }
-
-        .add-btn:active {
-            transform: scale(0.95); /* 点击时缩小 */
-        }
+        /* --- 全局与布局样式 (与之前版本相同) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .app-container { width: 100%; max-width: 512px; margin: 0 auto; }
+        .glass-container { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 1rem; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); padding: 2rem; }
         
-        .filter-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.875rem;
-        }
+        /* --- 组件样式 (大部分与之前版本相同) --- */
+        header { text-align: center; margin-bottom: 1.5rem; }
+        h1 { font-size: 2.25rem; font-weight: 700; color: white; letter-spacing: 0.05em; }
+        #date-display { font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; }
+        #add-todo-form { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+        #new-todo-input { flex-grow: 1; background-color: rgba(255, 255, 255, 0.1); color: white; border: 2px solid transparent; border-radius: 0.5rem; padding: 0.75rem 1rem; outline: none; transition: all 0.3s ease; }
+        #new-todo-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        #new-todo-input:focus { border-color: rgba(255, 255, 255, 0.5); background-color: rgba(255, 255, 255, 0.2); }
+        .add-btn { background-color: #8B5CF6; color: white; font-weight: 700; border: none; border-radius: 0.5rem; padding: 0.75rem 1.25rem; cursor: pointer; transition: all 0.2s ease; }
+        .add-btn:hover { background-color: #7C3AED; transform: scale(1.05); }
+        .add-btn:active { transform: scale(0.95); }
+        .filter-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; }
+        .filter-buttons { display: flex; gap: 0.5rem; }
+        .filter-btn, #clear-completed-btn { background: none; border: none; color: inherit; cursor: pointer; padding: 0.25rem 0.75rem; border-radius: 0.375rem; transition: all 0.2s ease; }
+        .filter-btn:hover, #clear-completed-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .filter-btn.active { background-color: rgba(255, 255, 255, 0.2); }
+        #todo-list-container { max-height: 20rem; overflow-y: auto; padding-right: 0.5rem; }
+        #todo-list { list-style: none; }
+        .todo-item-left { display: flex; align-items: center; gap: 0.75rem; }
+        .delete-btn { background: none; border: none; color: rgba(255, 255, 255, 0.5); font-size: 1.25rem; font-weight: 700; cursor: pointer; transition: color 0.2s ease; }
+        .delete-btn:hover { color: white; }
+        footer { margin-top: 1.5rem; text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.75rem; }
+        .credits { text-align: center; color: rgba(255, 255, 255, 0.5); font-size: 0.75rem; margin-top: 1.5rem; }
+        .custom-checkbox { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.5); cursor: pointer; transition: all 0.2s ease; position: relative; flex-shrink: 0; }
+        .custom-checkbox:checked { background-color: #8B5CF6; border-color: #8B5CF6; }
+        .custom-checkbox:checked::after { content: '✔'; color: white; font-size: 12px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .filter-btn, #clear-completed-btn {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s ease;
-        }
-        
-        .filter-btn:hover, #clear-completed-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .filter-btn.active {
-             background-color: rgba(255, 255, 255, 0.2);
-        }
+        /* --- 4. 动画与任务项样式 (核心改动部分) --- */
 
-        #todo-list-container {
-            max-height: 20rem; /* 列表最大高度 */
-            overflow-y: auto; /* 内容超出时显示滚动条 */
-            padding-right: 0.5rem; /* 为滚动条留出空间 */
-        }
-        
-        #todo-list {
-            list-style: none; /* 移除默认的列表点 */
-        }
-
+        /* 知识点: CSS 过渡 (Transition) */
+        /* 这是实现排序动画的关键！
+           我们告诉浏览器，当 .todo-item 元素的 transform 或 background-color 属性发生变化时，
+           不要立即改变，而是用 0.4 秒的时间平滑地过渡过去。
+           当JS改变DOM顺序时，浏览器会计算出元素的新位置，这个 transition 就会让元素“飞”到新位置，而不是“闪现”。
+        */
         .todo-item {
             display: flex;
             align-items: center;
@@ -168,55 +58,22 @@
             padding: 0.75rem;
             margin-bottom: 0.5rem;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
             background-color: rgba(255, 255, 255, 0.3);
+            transition: transform 0.4s ease-in-out, background-color 0.3s ease;
         }
         
+        /* 任务完成时的样式 (无变化) */
         .todo-item.done {
             background-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.5);
         }
         
         .todo-item .task-text.done {
-            text-decoration: line-through; /* 删除线 */
+            text-decoration: line-through;
         }
 
-        .todo-item-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .delete-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.25rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        
-        .delete-btn:hover {
-            color: white;
-        }
-
-        footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-        }
-        
-        .credits {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        /* --- 4. 动画与自定义组件 --- */
         /* 知识点: @keyframes 动画 */
+        /* 这两个动画用于元素的添加和删除，与排序动画无关，保持不变。*/
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -224,61 +81,29 @@
         .todo-item.new {
             animation: slideIn 0.3s ease-out;
         }
-
+        
+        /* 为了演示效果，删除动画暂时保留 */
         @keyframes fadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.9); }
+            to { opacity: 0; height: 0; padding: 0; margin: 0; border: 0;}
         }
         .todo-item.removing {
-            animation: fadeOut 0.3s ease-in;
+            animation: fadeOut 0.3s ease-in forwards;
         }
 
-        /* 知识点: 自定义表单控件 */
-        .custom-checkbox {
-            appearance: none; /* 移除浏览器默认样式 */
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            flex-shrink: 0; /* 防止flex布局压缩它 */
-        }
-        .custom-checkbox:checked {
-            background-color: #8B5CF6;
-            border-color: #8B5CF6;
-        }
-        .custom-checkbox:checked::after {
-            content: '✔';
-            color: white;
-            font-size: 12px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
     </style>
 </head>
 <body>
-
     <main class="app-container">
+        <!-- HTML结构与之前版本相同 -->
         <div class="glass-container">
             <header>
                 <h1>Today's Focus</h1>
                 <p id="date-display"></p>
             </header>
-
             <form id="add-todo-form">
-                <input 
-                    id="new-todo-input"
-                    type="text" 
-                    placeholder="添加新任务，然后按回车..."
-                >
+                <input id="new-todo-input" type="text" placeholder="添加新任务，然后按回车...">
                 <button type="submit" class="add-btn">添加</button>
             </form>
-
             <div class="filter-controls">
                 <div class="filter-buttons">
                     <button data-filter="all" class="filter-btn active">全部</button>
@@ -287,21 +112,15 @@
                 </div>
                 <button id="clear-completed-btn">清除已完成</button>
             </div>
-
             <div id="todo-list-container">
-                <ul id="todo-list">
-                    <!-- 待办事项将由JavaScript动态生成 -->
-                </ul>
+                <ul id="todo-list"></ul>
             </div>
-            
             <footer>
                 <p><span id="active-count">0</span> 个任务未完成</p>
             </footer>
         </div>
-        
         <p class="credits">由 Gemini 精心为您打造</p>
     </main>
-
     <script type="module" src="main.js"></script>
 </body>
 </html>
